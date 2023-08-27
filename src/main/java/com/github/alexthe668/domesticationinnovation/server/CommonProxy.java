@@ -570,18 +570,20 @@ public class CommonProxy {
                 int bars = TameableUtils.getBlazingProtectionBars(event.getEntity());
                 if (bars > 0) {
                     Entity attacker = event.getSource().getEntity();
-                    if (attacker instanceof LivingEntity && !TameableUtils.hasSameOwnerAs((LivingEntity) attacker, event.getEntity())) {
-                        attacker.setSecondsOnFire(5 + event.getEntity().getRandom().nextInt(3));
-                        ((LivingEntity) attacker).knockback(0.4, event.getEntity().getX() - attacker.getX(), event.getEntity().getZ() - attacker.getZ());
+                    if (attacker != null) {
+                        if (attacker instanceof LivingEntity && !TameableUtils.hasSameOwnerAs((LivingEntity) attacker, event.getEntity())) {
+                            attacker.setSecondsOnFire(5 + event.getEntity().getRandom().nextInt(3));
+                            ((LivingEntity) attacker).knockback(0.4, event.getEntity().getX() - attacker.getX(), event.getEntity().getZ() - attacker.getZ());
+                        }
+                        event.setCanceled(true);
+                        flag = true;
+                        for (int i = 0; i < 3 + event.getEntity().getRandom().nextInt(3); i++) {
+                            attacker.level.addParticle(ParticleTypes.FLAME, event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
+                        }
+                        event.getEntity().playSound(DISoundRegistry.BLAZING_PROTECTION.get(), 1, event.getEntity().getVoicePitch());
+                        TameableUtils.setBlazingProtectionBars(event.getEntity(), bars - 1);
+                        TameableUtils.setBlazingProtectionCooldown(event.getEntity(), 600);
                     }
-                    event.setCanceled(true);
-                    flag = true;
-                    for (int i = 0; i < 3 + event.getEntity().getRandom().nextInt(3); i++) {
-                        attacker.level.addParticle(ParticleTypes.FLAME, event.getEntity().getRandomX(0.8F), event.getEntity().getRandomY(), event.getEntity().getRandomZ(0.8F), 0.0F, 0.0F, 0.0F);
-                    }
-                    event.getEntity().playSound(DISoundRegistry.BLAZING_PROTECTION.get(), 1, event.getEntity().getVoicePitch());
-                    TameableUtils.setBlazingProtectionBars(event.getEntity(), bars - 1);
-                    TameableUtils.setBlazingProtectionCooldown(event.getEntity(), 600);
                 }
             }
             if ((event.getSource() == DamageSource.DROWN || event.getSource() == DamageSource.DRY_OUT) && TameableUtils.hasEnchant(event.getEntity(), DIEnchantmentRegistry.AMPHIBIOUS)) {
